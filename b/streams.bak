@@ -1,0 +1,23 @@
+#lang racket
+(define (my-delay th)
+  (mcons #f th))
+
+(define (my-force p)
+  (if (mcar p)
+      (mcdr p)
+      (begin (set-mcar! p #t)
+             (set-mcdr! p ((mcdr p)))
+             (mcdr p))))
+
+
+
+(define ones
+  (lambda () (cons 1 ones)))
+
+(define (f x) (cons x (lambda() (f (+ x 1)))))
+
+(define nats1 (lambda () (f 1)))
+
+(define nats
+  (letrec ([f (lambda (x) (cons x (lambda() (f (+ x 1)))))])
+    (lambda () (f 1))))
