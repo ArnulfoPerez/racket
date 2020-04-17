@@ -3,7 +3,7 @@
 ;factorial
 (define factt
   (lambda (n acc)
-    (if (= n 0) 
+    (if (= n 0)
         acc
         (factt (- n 1)  (* acc n )))))
 (define fact
@@ -29,7 +29,7 @@
 (define (two-in-d x)
   (pow two-in-hotel x))
 
-(define (p-in-hotel p) (/ (pow pr p) hotels))
+(define (p-in-hotel p) (* (pow (/ pr hotels) p) hotels))
 
 (define pr-activity
   (lambda(p d)
@@ -46,7 +46,7 @@
 (define random-cases
   (lambda(p d)
     (* (days-choose-d d)(people-choose-p p))))
-  
+
 (define suspects
   (lambda(p d)
     (* (pr-activity p d) (random-cases p d))))
