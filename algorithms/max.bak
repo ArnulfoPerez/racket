@@ -1,0 +1,6 @@
+(define max1
+  (lambda (xs)
+  (match xs
+    [(list ) (error "empty list"]
+    [(list a) a]
+    [(list a xs) (max a max1 (xs))]))))

@@ -31,3 +31,17 @@
                 [bd (karatsuba b d (- n 1))]
                 [abcd (- (karatsuba (+ a b) (+ c d) (- n 1)) ac bd )])
             (+ (* ac split split) (* abcd split) bd)))))
+
+(define karatsuba1
+  (lambda (factor1 factor2 n)
+    (if (= n 1)
+          (* factor1 factor2)
+          (let* ([split (ten-to (two-to n))]
+                [a (quotient factor2 split)]
+                [b (remainder factor2 split)]
+                [c (quotient factor1 split)]
+                [d (remainder factor1 split)]
+                [ac (karatsuba1 a c (- n 1))]
+                [bd (karatsuba1 b d (- n 1))]
+                [abcd (- (karatsuba1 (+ a b) (+ c d) (- n 1)) ac bd )])
+            (string->number (string-append (number->string ac) (number->string abcd) (number->string bd)))))))
