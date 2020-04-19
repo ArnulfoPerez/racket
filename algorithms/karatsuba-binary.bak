@@ -38,15 +38,13 @@
   (lambda (factor1 factor2)
     (if (< (max factor1 factor2) 1024)
           (* factor1 factor2)
-          (let*
-              ([width (max (integer-length factor1) (integer-length factor2))]
-               [split (arithmetic-shift width -1)]
-               [a (arithmetic-shift factor2 (- split))]
-               [b (bitwise-bit-field factor2 0 split)]
-               [c (arithmetic-shift factor1 (- split))]
-               [d (bitwise-bit-field factor1 0 split)]
-               [ac (karatsuba a c)]
-               [bd (karatsuba b d)]
-               [abcd (- (karatsuba (+ a b) (+ c d)) ac bd )])
+          (let*-values
+              ([(width) (max (integer-length factor1) (integer-length factor2))]
+               [(split) (arithmetic-shift width -1)]
+               [(a b) (quotient/remainder factor2 (two-to split))]
+               [(c d) (quotient/remainder factor1 (two-to split))]
+               [(ac) (karatsuba a c)]
+               [(bd) (karatsuba b d)]
+               [(abcd) (- (karatsuba (+ a b) (+ c d)) ac bd )])
             (+ (arithmetic-shift ac (+ split split)) (arithmetic-shift abcd split) bd)))))
 
