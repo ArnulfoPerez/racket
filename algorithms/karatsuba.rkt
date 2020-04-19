@@ -27,13 +27,12 @@
   (lambda (factor1 factor2 n)
     (if (= n 1)
           (* factor1 factor2)
-          (let* ([width (two-to n)]
-                 [split (ten-to width)]
-                 [a (quotient factor2 split)]
-                 [b (remainder factor2 split)]
-                 [c (quotient factor1 split)]
-                 [d (remainder factor1 split)]
-                 [ac (karatsuba a c (- n 1))]
-                 [bd (karatsuba b d (- n 1))]
-                [abcd (- (karatsuba (+ a b) (+ c d) (- n 1)) ac bd )])
+          (let*-values
+              ([(width) (two-to n)]
+               [(split) (ten-to width)]
+               [(a b) (quotient/remainder factor2 split)]
+               [(c d) (quotient/remainder factor1 split)]
+               [(ac) (karatsuba a c (- n 1))]
+               [(bd) (karatsuba b d (- n 1))]
+               [(abcd) (- (karatsuba (+ a b) (+ c d) (- n 1)) ac bd )])
             (+ ( multiply-by-power-of-ten ac (+ width width)) ( multiply-by-power-of-ten abcd width) bd)))))
