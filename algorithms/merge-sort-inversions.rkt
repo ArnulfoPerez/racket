@@ -17,10 +17,12 @@
   (letrec ([aux
             (lambda (vs inversions)
               (match vs
-                [(list) vs]
-                [(list a) vs]
+                [(list) (values vs 0)]
+                [(list a) (values vs 0)]
                 [_ (let*-values
                        ([(lvs rvs) (split-at vs (quotient (length vs) 2))]
-                        [ (lst inversions) (merge (merge-sort lvs) (merge-sort rvs))])
-                     lst)]))])
+                        [(llst linv) (aux lvs inversions)]
+                        [(rlst rinv) (aux rvs inversions)]
+                        [ (lst minv) (merge llst rlst)])
+                     (values lst (+ linv minv rinv)))]))])
     (aux vs 0)))
