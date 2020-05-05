@@ -17,6 +17,7 @@
   (match vs
     [(list) vs]
     [(list a) vs]
-    [_ (define-values (lvs rvs)
-         (split-at vs (quotient (length vs) 2)))
-       (merge (merge-sort lvs) (merge-sort rvs))]))
+    [_ (let*-values
+        ([(lvs rvs) (split-at vs (quotient (length vs) 2))]
+        [ (lst inversions) (merge (merge-sort lvs) (merge-sort rvs))])
+        lst)]))
