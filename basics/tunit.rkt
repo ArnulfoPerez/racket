@@ -1,0 +1,15 @@
+#lang racket
+(require rackunit)
+
+(check-eq? (list 1) (list 1) "allocated data not eq?")
+(check-eq? "hola" "hola" "allocated data not eq?")
+(check-eq? 1 1 "allocated data not eq?")
+(check-not-eq? 1 1 "fixnums are eq?")
+(check-eqv? 1 1.0 "not eqv?")
+ (check-not-eqv? 1 1 "integers are eqv?")
+(check-equal? 1 1.0 "not equal?")
+(check-not-equal? (list 1) (list 1) "equal?")
+(check-pred string? "I work")
+(check-pred number? "I fail")
+(check-= 1.0 1.01 0.02 "I work")
+(check-= 1.0 1.01 0.005 "I fail")

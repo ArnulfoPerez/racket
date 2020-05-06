@@ -1,0 +1,17 @@
+#lang racket
+
+(require graph)
+
+(define (dijkstra G src) 
+  (define-vertex-property G d #:init +inf.0) ; length of currently known shortest path
+  (define-vertex-property G π #:init #f) ; (π v) is predecessor of v on shortest path
+  (define (wgt u v) (edge-weight G u v))
+
+  (do-bfs G src #:init-queue (mk-empty-priority (λ (u v) (< (d u) (d v))))
+    #:init (d-set! src 0)
+    #:enqueue?: (> (d $v) (+ (d $from) (wgt $from $v)))
+    #:on-enqueue: 
+      (d-set! $v (+ (d $from) (wgt $from $v)))
+      (π-set! $v $from)
+    #:return: (values (d->hash) (π->hash))))
+    

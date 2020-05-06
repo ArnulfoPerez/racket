@@ -1,0 +1,4 @@
+#lang racket
+
+(define z 0)
+(+ z 3)
