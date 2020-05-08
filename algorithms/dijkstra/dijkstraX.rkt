@@ -1,0 +1,90 @@
+#lang racket/base
+(require racket/generic)
+(provide (all-defined-out))
+(define-generics queue
+  (enqueue! queue x)
+  (peek queue)
+  (dequeue! queue)
+  (empty? queue)
+  (in-queue queue))
+(require (prefix-in r: data/heap))
+(require graph)
+(provide (all-defined-out))
+
+;; priority queue such that on dequeue of element x,
+;; pop all copies of x from the queue
+
+(struct priority (elements)
+  #:methods gen:queue
+  [(define (enqueue! pq x) (r:heap-add! (priority-elements pq) x))
+   (define (peek pq) (r:heap-min (priority-elements pq)))
+   (define (dequeue! pq) 
+     (define hp (priority-elements pq))
+     (define x (r:heap-min hp))
+     (begin0 x
+             (let loop ()
+               (r:heap-remove-min! hp)
+               (when (and (not (zero? (r:heap-count hp))) 
+                          (equal? (r:heap-min hp) x))
+                 (loop)))))
+   (define (empty? pq) (zero? (r:heap-count (priority-elements pq))))
+   (define (in-queue pq) ; consumes the pq
+     (make-do-sequence
+      (λ ()
+       (values
+        dequeue! ; pos->element
+        values   ; next-pos (dequeue! already removed element, so this is just id)
+        pq       ; pos: use entire queue as pos
+        (λ (x) (not (empty? pq))) ; continue-with-pos?
+        #f #f
+        ))))])
+     
+(define (mk-empty-priority <=) (priority (r:make-heap <=)))
+
+(define (dijkstraX G src) 
+  (define-vertex-property G d #:init +inf.0) ; length of currently known shortest path
+  (define-vertex-property G π #:init #f) ; (π v) is predecessor of v on shortest path
+  (define (wgt u v) (edge-weight G u v))
+  (d-set! src 0)
+  (define pq (mk-empty-priority (λ (u v) (< (d u) (d v)))))
+  (for ([x (in-vertices G)])
+    (enqueue! pq x))
+  (for ([from (in-queue pq)])
+    (for ([v (in-neighbors G from)])
+      (if (> (d v) (+ (d from) (wgt from v)))
+          (begin
+            (d-set! v (+ (d from) (wgt from v)))
+           (π-set! v from)
+           (enqueue! pq v))
+          #f)))
+  (values (d->hash) (π->hash)))
+          
+
+(define g (weighted-graph/directed null))
+
+(add-directed-edge! g 1 2 4)
+(add-directed-edge! g 1 4 1)
+(add-directed-edge! g 2 1 74)
+(add-directed-edge! g 2 3 2)
+(add-directed-edge! g 2 5 12)
+(add-directed-edge! g 3 2 12)
+(add-directed-edge! g 3 10 12)
+(add-directed-edge! g 3 6 74)
+(add-directed-edge! g 4 7 22)
+(add-directed-edge! g 4 5 32)
+(add-directed-edge! g 5 8 33)
+(add-directed-edge! g 5 4 66)
+(add-directed-edge! g 5 6 76)
+(add-directed-edge! g 6 10 21)
+(add-directed-edge! g 6 9 11)
+(add-directed-edge! g 7 3 12)
+(add-directed-edge! g 7 8 10)
+(add-directed-edge! g 8 7 2)
+(add-directed-edge! g 8 9 72)
+(add-directed-edge! g 9 10 7)
+(add-directed-edge! g 9 6 31)
+(add-directed-edge! g 9 8 18)
+(add-directed-edge! g 10 6 8)
+
+(define source 1)
+(dijkstraX g source)
